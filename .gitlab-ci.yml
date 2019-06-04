@@ -4,10 +4,8 @@ stages:
 test:
   stage: test
   script:
-    - pip install -r requirements.txt
+    - pip install tox
+    - tox
     - pip install circuitpython-build-tools Sphinx sphinx-rtd-theme
-    - pip install --force-reinstall pylint==1.9.2
-    - pylint circuitroomba.py
-    - ([[ ! -d "examples" ]] || pylint --disable=missing-docstring,invalid-name,bad-whitespace examples/*.py)
     - circuitpython-build-bundles --filename_prefix circuitroomba --library_location .
     - cd docs && sphinx-build -E -W -b html . _build/html && cd ..

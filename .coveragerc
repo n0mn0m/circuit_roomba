@@ -1,0 +1,11 @@
+[run]
+branch = True
+source = roomba
+
+[paths]
+source =
+   src/roomba
+   .tox/*/lib/python*/site-packages/cloud
+
+[report]
+show_missing = True

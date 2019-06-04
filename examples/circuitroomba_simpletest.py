@@ -15,6 +15,7 @@ stop_codes = [power, stop]
 
 c = 0
 
+
 def wake_up(brc):
     brc.value = False
     time.sleep(0.5)
@@ -22,6 +23,7 @@ def wake_up(brc):
     time.sleep(0.5)
     brc.value = False
     time.sleep(0.5)
+
 
 brc = digitalio.DigitalInOut(board.A1)
 brc.direction = digitalio.Direction.OUTPUT
@@ -41,8 +43,7 @@ while True:
         uart.write(code)
         print(code)
 
-
-    c +=1
+    c += 1
 
     print(brc)
     print(c)
