@@ -2,3 +2,4 @@ tox
 flake8
 mypy
 black
+coverage

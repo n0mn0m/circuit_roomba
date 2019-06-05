@@ -1,11 +1,11 @@
 [run]
 branch = True
-source = roomba
+source = circuitroomba
 
 [paths]
 source =
-   src/roomba
-   .tox/*/lib/python*/site-packages/cloud
+   src/circuitroomba
+   .tox/*/lib/python*/site-packages/circuitroomba
 
 [report]
 show_missing = True

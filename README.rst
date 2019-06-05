@@ -1,6 +1,9 @@
 Introduction
 ============
 
+.. image:: https://gitlab.com/gitlab-org/gitlab-ce/badges/master/coverage.svg?job=coverage
+    :target: http://gitlab-org.gitlab.io/gitlab-ce/circuitroomba
+    :alt: Coverage report
 .. image:: https://readthedocs.org/projects/circuitpython-circuitroomba/badge/?version=latest
     :target: https://circuitpython-circuitroomba.readthedocs.io/
     :alt: Documentation Status
