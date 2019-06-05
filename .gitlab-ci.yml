@@ -3,21 +3,11 @@ image: python:3.7
 test:
   stage: test
   script:
-    - pip install circuitpython-build-tools Sphinx sphinx-rtd-theme tox
+    - pip install circuitpython-build-tools Sphinx sphinx-rtd-theme tox codecov
     - tox
     # - circuitpython-build-bundles --filename_prefix circuitroomba --library_location .
+    - codecov --token="4a53c14b-28e3-4d3d-bc1a-7ed8c9a001c6"
   artifacts:
     paths:
       - htmlcov/
-
-pages:
-  stage: deploy
-  script:
-    - mv htmlcov/ public/
-  artifacts:
-    paths:
-      - public
-    expire_in: 30 days
-  only:
-    - master
 
