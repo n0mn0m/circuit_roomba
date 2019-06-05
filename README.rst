@@ -1,19 +1,16 @@
 Introduction
 ============
 
-.. image:: https://gitlab.com/gitlab-org/gitlab-ce/badges/master/coverage.svg?job=coverage
-    :target: http://gitlab-org.gitlab.io/gitlab-ce/circuitroomba
-    :alt: Coverage report
-.. image:: https://readthedocs.org/projects/circuitpython-circuitroomba/badge/?version=latest
-    :target: https://circuitpython-circuitroomba.readthedocs.io/
+.. image:: https://codecov.io/gl/AlexanderHagerman/circuitroomba/branch/master/graph/badge.svg
+    :target: https://codecov.io/gl/AlexanderHagerman/circuitroomba
+    :alt: Coverage Report
+
+.. image:: https://readthedocs.org/projects/circuitroomba/badge/?version=latest
+    :target: https://circuitroomba.readthedocs.io
     :alt: Documentation Status
 
-.. image:: https://img.shields.io/discord/327254708534116352.svg
-    :target: https://discord.gg/nBQh6qu
-    :alt: Discord
-
-.. image:: https://travis-ci.com/AlexHagerman/CircuitPython_circuitroomba.svg?branch=master
-    :target: https://travis-ci.com/AlexHagerman/CircuitPython_circuitroomba
+.. image:: https://gitlab.com/AlexanderHagerman/circuitroomba/badges/master/pipeline.svg
+    :target: https://gitlab.com/AlexanderHagerman/circuitroomba/commits/master
     :alt: Build Status
 
 CircuitPython helper library for interfacing with Roomba Open Interface devices.
