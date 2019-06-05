@@ -6,7 +6,7 @@ Introduction
     :alt: Coverage Report
 
 .. image:: https://readthedocs.org/projects/circuitroomba/badge/?version=latest
-    :target: https://circuitroomba.readthedocs.io
+    :target: https://circuitroomba.readthedocs.io/en/latest/?badge=latest
     :alt: Documentation Status
 
 .. image:: https://gitlab.com/AlexanderHagerman/circuitroomba/badges/master/pipeline.svg
