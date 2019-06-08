@@ -13,7 +13,7 @@ Introduction
     :target: https://gitlab.com/AlexanderHagerman/circuitroomba/commits/master
     :alt: Build Status
 
-CircuitPython helper library for interfacing with Roomba Open Interface devices.
+CircuitRoomba is a CircuitPython library for interfacing with Roomba Open Interface devices.
 
 
 Dependencies
@@ -28,22 +28,11 @@ This is easily achieved by downloading
 
 Installing from PyPI
 --------------------
-.. note:: This library is not available on PyPI yet. Install documentation is included
-   as a standard element. Stay tuned for PyPI availability!
-.. todo:: Remove the above note if PyPI version is/will be available at time of release.
-   If the library is not planned for PyPI, remove the entire 'Installing from PyPI' section.
-On supported GNU/Linux systems like the Raspberry Pi, you can install the driver locally `from
-PyPI <https://pypi.org/project/adafruit-circuitpython-circuitroomba/>`_. To install for current user:
 
 .. code-block:: shell
 
-    pip3 install adafruit-circuitpython-circuitroomba
+    pip install circuitroomba
 
-To install system-wide (this may be required in some cases):
-
-.. code-block:: shell
-
-    sudo pip3 install adafruit-circuitpython-circuitroomba
 
 To install in a virtual environment in your current project:
 
@@ -52,12 +41,36 @@ To install in a virtual environment in your current project:
     mkdir project-name && cd project-name
     python3 -m venv .env
     source .env/bin/activate
-    pip3 install adafruit-circuitpython-circuitroomba
+    pip install circuitroomba
 
 Usage Example
 =============
 
-.. todo:: Add a quick, simple example. It and other examples should live in the examples folder and be included in docs/examples.rst.
+.. code-block:: python
+
+    import board
+    import digitalio
+    from circuitroomba import series6
+
+    brc = digitalio.DigitalInOut(board.A1)
+
+    # Setup the interface
+    roomba = series6.Roomba(board.TX, board.RX, brc)
+
+    # Wake the roomba up
+    roomba.wake_up()
+
+    # Per the OI doc start must be the first command
+    roomba.start()
+
+    # Issue the rest of our commands
+    roomba.safe()
+    roomba.clean()
+    roomba.power()
+    roomba.stop()
+
+Additional examples can be found in `examples`.
+
 
 Contributing
 ============
@@ -66,32 +79,6 @@ Contributions are welcome! Please read our `Code of Conduct
 <https://github.com/AlexHagerman/CircuitPython_circuitroomba/blob/master/CODE_OF_CONDUCT.md>`_
 before contributing to help this project stay welcoming.
 
-Building locally
-================
-
-Zip release files
------------------
-
-To build this library locally you'll need to install the
-`circuitpython-build-tools <https://github.com/adafruit/circuitpython-build-tools>`_ package.
-
-.. code-block:: shell
-
-    python3 -m venv .env
-    source .env/bin/activate
-    pip install circuitpython-build-tools
-
-Once installed, make sure you are in the virtual environment:
-
-.. code-block:: shell
-
-    source .env/bin/activate
-
-Then run the build:
-
-.. code-block:: shell
-
-    circuitpython-build-bundles --filename_prefix circuitpython-circuitroomba --library_location .
 
 Sphinx documentation
 -----------------------
