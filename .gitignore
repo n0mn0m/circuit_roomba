@@ -125,3 +125,6 @@ dmypy.json
 
 # Jetbrains
 .idea/
+
+# Local
+.DS_Store

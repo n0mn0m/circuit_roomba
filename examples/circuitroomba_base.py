@@ -28,28 +28,25 @@ CircuitPython helper library for interfacing with Roomba Open Interface devices.
 
 * Author(s): Alexander Hagerman
 
-Implementation Notes
---------------------
-
 **Hardware:**
 
-.. todo:: Add links to any specific hardware product page(s), or category page(s).
-   inline format: "* `Link Text <url>`_"
+* Adafruit Circuit Playground Express
 
 **Software and Dependencies:**
 
 * Adafruit CircuitPython firmware for the supported boards:
   https://github.com/adafruit/circuitpython/releases
-
-.. todo:: Uncomment or remove the Bus Device and/or the Register library dependencies.
-
-# * Adafruit's Bus Device library:
-# * https://github.com/adafruit/Adafruit_CircuitPython_BusDevice
-# * Adafruit's Register library:
-# * https://github.com/adafruit/Adafruit_CircuitPython_Register
 """
 
-# imports
+import os
+import board
+from circuitroomba.series6 import roomba
 
-__version__ = "0.0.0-auto.0"
-__repo__ = "https://github.com/AlexHagerman/CircuitPython_circuitroomba.git"
+__version__ = open(os.path.join( os.getcwd(), '..', 'VERSION' )).read().strip()
+__repo__ = "https://github.com/AlexanderHagerman/circuitroomba.git"
+
+bot = roomba.Roomba(board.RX, board.TX, board.A1)
+bot.wake_up()
+bot.start()
+bot.clean()
+bot.stop()
