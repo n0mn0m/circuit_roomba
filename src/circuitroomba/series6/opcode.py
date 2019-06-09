@@ -45,6 +45,7 @@ baud_codes = {
     10: 57600,
     11: 115200,
 }
+
 valid_modes = ("off", "safe", "passive", "full")
 
 mode_commands = {
@@ -56,32 +57,28 @@ mode_commands = {
 }
 
 commands = {
-    "start": {
+    "0x80": {
         "int_opcode": 128,
-        "hex_opcode": START,
         "data_bytes": 0,
         "new_mode": "passive",
         "new_mode_hex_opcode": "",
     },
-    "reset": {
+    "0x7": {
         "int_opcode": 7,
-        "hex_opcode": RESET,
         "data_bytes": 0,
         "new_mode": "off",
         "new_mode_hex_opcode": "",
     },
-    "stop": {
+    "0xad": {
         "int_opcode": 173,
-        "hex_opcode": STOP,
         "data_bytes": 0,
         "new_mode": "off",
         "new_mode_hex_opcode": "",
     },
-    "baud": {
+    "0x81": {
         "int_opcode": 129,
-        "hex_opcode": BAUD,
         "data_bytes": 1,
-        "new_mode": None,
+        "new_mode": "passive",  # research how to best handle noop
         "new_mode_hex_opcode": "",
     },
 }

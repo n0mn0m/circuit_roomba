@@ -1,15 +1,14 @@
-import digitalio
 import time
 from .opcode import START, STOP, CLEAN, RESET, BAUD, baud_codes
 from .interface import OpenInterface
 
 
-class RoombaController(OpenInterface):
+class Roomba(OpenInterface):
     """
     """
 
-    def __init__(self, input_pin, output_pin, baud_rate_change_pin):
-        super().__init__(input_pin, output_pin, baud_rate_change_pin)
+    def __init__(self, rx_pin, tx_pin, brc_pin, baud_rate=115200):
+        super().__init__(rx_pin, tx_pin, brc_pin, baud_rate)
 
     def __repr__(self):
         return (
@@ -18,22 +17,6 @@ class RoombaController(OpenInterface):
             self._tx_pin,
             self._brc_pin,
         )
-
-    def wake_up(self):
-        """
-        If the circuitroomba is in passive mode without any byte activity on the RX pin
-        for 5 minutes it will will enter into a sleep mode. To wake it up
-        you need to pulse the RX pin LOW/HIGH/LOW.
-        """
-        self._brc_pin.direction = digitalio.Direction.OUTPUT
-
-        for i in range(3):
-            self._brc_pin.value = False
-            time.sleep(0.5)
-            self._brc_pin.value = True
-            time.sleep(0.5)
-            self._brc_pin.value = False
-            time.sleep(0.5)
 
     def start(self):
         """
@@ -83,7 +66,7 @@ class RoombaController(OpenInterface):
         If you have a controller that needs to use 19200 on serial instead this method
         should be called right after the Roomba wakes up before any other commands.
         """
-        self._manual_set_baud_rate()
+        self._brc_set_baud_rate()
 
     def baud(self, baud_rate_code=None):
         """
@@ -103,7 +86,8 @@ class RoombaController(OpenInterface):
         """
 
         if baud_rate_code in baud_codes.keys():
-            self.command(BAUD, data=baud_codes[baud_rate_code])
+            self.baud_rate = baud_codes[baud_rate_code]
+            self.command(BAUD, baud_rate_code)
             # per the OI spec another command cannot be issued after the baud command
             # for 100ms
             time.sleep(1 / 1000000)
