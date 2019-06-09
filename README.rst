@@ -49,27 +49,21 @@ Usage Example
 .. code-block:: python
 
     import board
-    import digitalio
-    from circuitroomba import series6
-
-    brc = digitalio.DigitalInOut(board.A1)
+    from circuitroomba.series6 import roomba
 
     # Setup the interface
-    roomba = series6.Roomba(board.TX, board.RX, brc)
+    bot = roomba.Roomba(board.RX, board.TX, board.A1)
 
     # Wake the roomba up
-    roomba.wake_up()
+    bot.wake_up()
 
     # Per the OI doc start must be the first command
-    roomba.start()
+    bot.start()
 
     # Issue the rest of our commands
-    roomba.safe()
-    roomba.clean()
-    roomba.power()
-    roomba.stop()
+    bot.clean()
+    bot.stop()
 
-Additional examples can be found in `examples`.
 
 
 Contributing
