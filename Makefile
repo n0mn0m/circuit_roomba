@@ -12,3 +12,8 @@ locate:
 
 connect:
 	screen /dev/tty.usbmodem143101 115200
+
+clean:
+	pip uninstall circuitroomba
+	rm -rf .tox .eggs src/circuitroomba.egg-info
+

@@ -1,6 +1,9 @@
 import time
+import busio
 import digitalio
 from .opcode import commands, mode_commands, valid_modes
+
+TRACK_HISTORY = False
 
 
 class OpenInterface:
@@ -39,7 +42,7 @@ class OpenInterface:
     https://www.irobotweb.com/~/media/MainSite/PDFs/About/STEM/Create/iRobot_Roomba_600_Open_Interface_Spec.pdf # noqa
     """
 
-    def __init__(self, input_pin, output_pin, baud_rate_change_pin, baud_rate=115200):
+    def __init__(self, rx_pin, tx_pin, brc_pin, baud_rate=115200):
         """
         Initialize communication pins and state. State is referred to as
         operating mode to stay consistent with the Open Interface Specification
@@ -48,44 +51,47 @@ class OpenInterface:
         Two list are created to capture operating mode and command history. Both
         store the last 5 items processed.
         """
-        self._rx_pin = input_pin
-        self._tx_pin = output_pin
-        self._brc_pin = baud_rate_change_pin
+        self._board = busio.UART(tx_pin, rx_pin, baudrate=baud_rate)
+        self._rx_pin = rx_pin
+        self._tx_pin = tx_pin
+        self._brc_pin = brc_pin
         self.baud_rate = baud_rate
-        self.operating_mode = "off"
-        self.operating_mode_history = [0 for i in range(4)]
-        self.command = None
-        self.command_history = [0 for i in range(4)]
-        self.data = None
-        self.data_history = [0 for i in range(4)]
-
-    @property
-    def operating_mode(self):
-        return self.operating_mode
-
-    @operating_mode.setter
-    def operating_mode(self, new_mode):
-        if new_mode not in valid_modes:
-            raise RuntimeError(
-                "New mode %s is not a valid mode. See page 5 of the open interface"
-                "specification or refer to the OpenInterface valid_modes attribute.",
-                new_mode,
-            )
-        else:
-            self.mode_history.pop()
-            self.mode_history.insert(0, self.operating_mode)
-            self.operating_mode = new_mode
+        self._operating_mode = "off"
+        if TRACK_HISTORY:
+            self._history = [None for i in range(10)]
 
     @property
     def valid_modes(self):
         return valid_modes
 
     @property
-    def command(self):
-        return self.command
+    def history(self):
+        return self._history
 
-    @command.setter
-    def command(self, new_command, data=None):
+    @history.setter
+    def history(self, new_history):
+        for i in range(1, len(self._history)):
+            self._history[-i] = self._history[-(i + 1)]
+        self._history[0] = new_history
+
+    @property
+    def operating_mode(self):
+        return self._operating_mode
+
+    @operating_mode.setter
+    def operating_mode(self, new_mode):
+        if new_mode in valid_modes:
+            self._operating_mode = new_mode
+        else:
+            raise RuntimeError(
+                "New mode %s is not a valid mode.\n"
+                "See page 5 of the open interface specification or refer to the"
+                " OpenInterface valid_modes attribute." % (new_mode)
+            )
+        if TRACK_HISTORY:
+            self.history = (new_mode, None, None)
+
+    def command(self, new_command, data=0):
         """
         Accepts an inbound command that should be sent to the OI RX pin.
         Data should be an int inline with the OI specification document
@@ -94,51 +100,54 @@ class OpenInterface:
         Command is called to handle validation of the mode and state
         transition as well as verify the data matches spec requirements.
         """
-        self.data = bytes(data)
         command_struct = commands[new_command]
+        bdata = bytes([data])
 
-        self.command_history.pop()
-        self.command_history.insert(0, command_struct["hex_opcode"])
-        self.command = command_struct["hex_opcode"]
-
-        if new_command in mode_commands[new_command]:
-            self._rx_pin.value = self.command
+        if new_command in mode_commands[self.operating_mode]:
+            self._board.write(new_command)
         else:
             raise RuntimeError(
-                "Illegal command in current mode.\nCannot call %s in %s mode.\nRefer"
-                "to the Roomba 600 Interface Spec for more information",
-                new_command,
-                self.operating_mode,
+                "Illegal command in current mode.\n"
+                "Cannot call %s in %s mode.\n"
+                "Refer to the Roomba 600 Interface Spec for more information.\n"
+                % (new_command, self.operating_mode)
             )
 
-        if (
-            command_struct["data_bytes"]
-            and len(self.data) == command_struct["data_bytes"]
-        ):
-            self.data_history.pop()
-            self.data_history.insert(0, self.data)
-            self._rx_pin.value = self.data
-        else:
+        if data and len(bdata) == command_struct["data_bytes"]:
+            self._board.write(bdata)
+        elif data and len(bdata) != command_struct["data_bytes"]:
             raise RuntimeError(
                 "Correct amount of data bytes not provided for command.\n"
-                "Expected %s "
+                "Expected %s \n"
                 "Recieved %s.\n"
                 "Refer to command %s in Roomba Open Interface Spec for data byte "
-                "information",
-                command_struct["data_bytes"],
-                len(self.data),
-                new_command,
+                "information" % (command_struct["data_bytes"], len(bdata), new_command)
             )
 
         if command_struct["new_mode"]:
             self.operating_mode = command_struct["new_mode"]
-            self._rx_pin = command_struct["new_mode_hex_opcode"]
+            self._board.write(command_struct["new_mode_hex_opcode"])
 
-    @property
-    def baud_rate(self):
-        return self.baud_rate
+        if TRACK_HISTORY:
+            self.history = (None, new_command, bdata)
 
-    def _manual_set_baud_rate(self, baud_rate=19200):
+    def wake_up(self):
+        """
+        If the circuitroomba is in passive mode without any byte activity on the RX pin
+        for 5 minutes it will will enter into a sleep mode. To wake it up
+        you need to pulse the RX pin LOW/HIGH/LOW.
+        """
+        self._brc_pin.direction = digitalio.Direction.OUTPUT
+
+        for i in range(3):
+            self._brc_pin.value = False
+            time.sleep(0.5)
+            self._brc_pin.value = True
+            time.sleep(0.5)
+            self._brc_pin.value = False
+            time.sleep(0.5)
+
+    def _brc_set_baud_rate(self, baud_rate=19200):
         """
         Function should be the first call after the circuitroomba is powered on
         to set new BRC. This is not required if your boards baud rate is
