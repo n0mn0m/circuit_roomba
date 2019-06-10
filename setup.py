@@ -9,7 +9,7 @@ here = path.abspath(path.dirname(__file__))
 with open(path.join(here, "README.rst"), encoding="utf-8") as f:
     long_description = f.read()
 
-with open(path.join(here, 'VERSION')) as version_file:
+with open(path.join(here, "VERSION")) as version_file:
     version = version_file.read().strip()
 
 setup(
@@ -22,8 +22,7 @@ setup(
     long_description_content_type="text/x-rst",
     url="https://gitlab.com/AlexanderHagerman/circuitroomba",
     author="Alexander Hagerman",
-    author_email="alex@unexpectedeof.net",
-    install_requires=["Adafruit-Blinka"],
+    author_email="alexander@unexpectedeof.net",
     license="MIT",
     classifiers=[
         "Development Status :: 3 - Alpha",
@@ -35,8 +34,8 @@ setup(
         "Programming Language :: Python :: 3.7",
     ],
     keywords="adafruit blinka circuitpython micropython\
-circuitroomba circuitroomba robot automation",
+circuitroomba circuitroomba robot automation roomba interface",
     packages=find_packages(where="src"),
     package_dir={"": "src"},
-    version = version,
+    version=version,
 )

@@ -1,3 +1,8 @@
+"""
+This example can be used to pass the Roomba Open Interface the basic commands
+to power up, start and then stop from a Circuit Python board.
+"""
+
 import board
 import busio
 import digitalio
@@ -13,6 +18,10 @@ full_mode = b"\x84"
 start_codes = [start, safe_mode, clean]
 stop_codes = [power, stop]
 
+brc = digitalio.DigitalInOut(board.A1)
+brc.direction = digitalio.Direction.OUTPUT
+uart = busio.UART(board.TX, board.RX, baudrate=19200)
+
 c = 0
 
 
@@ -24,10 +33,6 @@ def wake_up(brc):
     brc.value = False
     time.sleep(0.5)
 
-
-brc = digitalio.DigitalInOut(board.A1)
-brc.direction = digitalio.Direction.OUTPUT
-uart = busio.UART(board.TX, board.RX, baudrate=19200)
 
 for i in range(3):
     wake_up(brc)
@@ -50,5 +55,5 @@ while True:
 
     wake_up(brc)
 
-    if c == 3:
+    if c == 2:
         break

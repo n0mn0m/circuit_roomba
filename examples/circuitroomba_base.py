@@ -38,15 +38,20 @@ CircuitPython helper library for interfacing with Roomba Open Interface devices.
   https://github.com/adafruit/circuitpython/releases
 """
 
-import os
 import board
+import time
 from circuitroomba.series6 import roomba
 
-__version__ = open(os.path.join( os.getcwd(), '..', 'VERSION' )).read().strip()
 __repo__ = "https://github.com/AlexanderHagerman/circuitroomba.git"
 
-bot = roomba.Roomba(board.RX, board.TX, board.A1)
+bot = roomba.Commands(board.RX, board.TX, board.A1)
+
 bot.wake_up()
 bot.start()
+bot.safe()
 bot.clean()
+
+time.sleep(5)
+
+bot.power()
 bot.stop()

@@ -1,13 +1,33 @@
 import time
-from .opcode import START, STOP, CLEAN, RESET, BAUD, baud_codes
+from .opcode import (
+    START,
+    STOP,
+    RESET,
+    BAUD,
+    SAFE,
+    FULL,
+    CLEAN,
+    MAX_CLEAN,
+    SPOT,
+    FORCE_SEEKING_DOCK,
+    POWER,
+    baud_codes,
+)
 from .interface import OpenInterface
 
 
-class Roomba(OpenInterface):
+class Commands(OpenInterface):
     """
+    Commands is an abstraction layer that exposes methods representing the operations
+    available in the Roomba Open Interface Spec.
+
+    >>> bot = roomba.Commands(board.RX, board.TX, board.A1)
+    >>> bot.wake_up()
+    >>> bot.start()
+    >>> bot.clean()
     """
 
-    def __init__(self, rx_pin, tx_pin, brc_pin, baud_rate=115200):
+    def __init__(self, rx_pin, tx_pin, brc_pin, baud_rate=115200, trace=False):
         super().__init__(rx_pin, tx_pin, brc_pin, baud_rate)
 
     def __repr__(self):
@@ -17,6 +37,14 @@ class Roomba(OpenInterface):
             self._tx_pin,
             self._brc_pin,
         )
+
+    def set_baud_rate_19200(self):
+        """
+        By default the Roomba Open Interface listens for commands at baud rate 115200.
+        If you have a controller that needs to use 19200 on serial instead this method
+        should be called right after the Roomba wakes up before any other commands.
+        """
+        self._brc_set_baud_rate()
 
     def start(self):
         """
@@ -33,21 +61,6 @@ class Roomba(OpenInterface):
 
         self.command(START)
 
-    def clean(self):
-        self.command(CLEAN)
-
-    def stop(self):
-        """
-        This command stops the OI. All streams will stop and the robot will no
-        longer respond to commands. Use this command when you are finished working
-        with the robot.
-
-        - Serial sequence: [173].
-        - Available in modes: Passive, Safe, or Full
-        - Changes mode to: Off. Roomba plays a song to acknowledge it is exiting the OI.
-        """
-        self.command(STOP)
-
     def reset(self):
         """
         This command resets the robot, as if you had removed and reinserted the battery.
@@ -60,13 +73,17 @@ class Roomba(OpenInterface):
 
         self.command(RESET)
 
-    def set_baud_rate_19200(self):
+    def stop(self):
         """
-        By default the Roomba Open Interface listens for commands at baud rate 115200.
-        If you have a controller that needs to use 19200 on serial instead this method
-        should be called right after the Roomba wakes up before any other commands.
+        This command stops the OI. All streams will stop and the robot will no
+        longer respond to commands. Use this command when you are finished working
+        with the robot.
+
+        - Serial sequence: [173].
+        - Available in modes: Passive, Safe, or Full
+        - Changes mode to: Off. Roomba plays a song to acknowledge it is exiting the OI.
         """
-        self._brc_set_baud_rate()
+        self.command(STOP)
 
     def baud(self, baud_rate_code=None):
         """
@@ -96,3 +113,94 @@ class Roomba(OpenInterface):
                 "Invalid baud rate code. Please refer to page 9 of the"
                 "Roomba Open Interface Spec."
             )
+
+    def safe(self):
+        """
+        Safe Opcode: 131 Data Bytes: 0
+        This command puts the OI into Safe mode, enabling user control of Roomba.
+        It turns off all LEDs. The OI can be in Passive, Safe, or Full mode to accept
+        this command. If a safety condition occurs (see above) Roomba reverts
+        automatically to Passive mode.
+
+        - Serial sequence: [131]
+        - Available in modes: Passive, Safe, or Full
+        - Changes mode to: Safe
+
+        Note: The effect and usage of the Control command (130) are identical to the
+        Safe command (131).
+        """
+        self.command(SAFE)
+
+    def full(self):
+        """
+        This command gives you complete control over Roomba by putting the OI into
+        Full mode, and turning off the cliff, wheel-drop and internal charger safety
+        features. That is, in Full mode, Roomba executes any command that you send it,
+        even if the internal charger is plugged in, or command triggers a cliff or
+        wheel drop condition.
+
+        - Serial sequence: [132]
+        - Available in modes: Passive, Safe, or Full
+        - Changes mode to: Full
+
+        Note: Use the Start command (128) to change the mode to Passive.
+        """
+        self.command(FULL)
+
+    def clean(self):
+        """
+        This command starts the default cleaning mode. This is the same as pressing
+        Roomba’s Clean button, and will pause a cleaning cycle if one is already in
+        progress.
+
+        - Serial sequence: [135]
+        - Available in modes: Passive, Safe, or Full
+        - Changes mode to: Passive
+        """
+        self.command(CLEAN)
+
+    def max(self):
+        """
+        This command starts the Max cleaning mode, which will clean until the battery
+        is dead. This command will pause a cleaning cycle if one is already in progress.
+
+        - Serial sequence: [136]
+        - Available in modes: Passive, Safe, or Full
+        - Changes mode to: Passive
+        """
+        self.command(MAX_CLEAN)
+
+    def spot(self):
+        """
+        This command starts the Spot cleaning mode. This is the same as pressing
+        Roomba’s Spot button, and will pause a cleaning cycle if one is already in
+        progress.
+
+        - Serial sequence: [134]
+        - Available in modes: Passive, Safe, or Full
+        - Changes mode to: Passive
+        """
+        self.command(SPOT)
+
+    def seek_dock(self):
+        """
+        This command directs Roomba to drive onto the dock the next time it encounters
+        the docking beams. This is the same as pressing Roomba’s Dock button, and will
+        pause a cleaning cycle if one is already in progress.
+
+        - Serial sequence: [143]
+        - Available in modes: Passive, Safe, or Full
+        - Changes mode to: Passive
+        """
+        self.command(FORCE_SEEKING_DOCK)
+
+    def power(self):
+        """
+        This command powers down Roomba. The OI can be in Passive, Safe, or Full mode
+        to accept this command.
+
+        - Serial sequence: [133]
+        - Available in modes: Passive, Safe, or Full
+        - Changes mode to: Passive
+        """
+        self.command(POWER)

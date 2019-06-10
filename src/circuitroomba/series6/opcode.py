@@ -30,6 +30,9 @@ BUTTONS = "0xa5"
 SCHEDULE = "0xa7"
 SET_DAY_TIME = "0xa8"
 STOP = "0xad"
+SAFE = "0x83"
+FULL = "0x84"
+
 
 baud_codes = {
     0: 300,
@@ -48,37 +51,25 @@ baud_codes = {
 
 valid_modes = ("off", "safe", "passive", "full")
 
+# Only SAFE and FULL have opcodes in the OI spec, because of that mode names
+# are used for keys instead of hex codes differing from commands.
 mode_commands = {
     "passive": (START, RESET, STOP, BAUD),
     "safe": (START, RESET, STOP, BAUD),
     "full": (START, RESET, STOP, BAUD),
     "off": (START, RESET),
-    None: (START),
 }
 
 commands = {
-    "0x80": {
-        "int_opcode": 128,
-        "data_bytes": 0,
-        "new_mode": "passive",
-        "new_mode_hex_opcode": "",
-    },
-    "0x7": {
-        "int_opcode": 7,
-        "data_bytes": 0,
-        "new_mode": "off",
-        "new_mode_hex_opcode": "",
-    },
-    "0xad": {
-        "int_opcode": 173,
-        "data_bytes": 0,
-        "new_mode": "off",
-        "new_mode_hex_opcode": "",
-    },
-    "0x81": {
-        "int_opcode": 129,
-        "data_bytes": 1,
-        "new_mode": "passive",  # research how to best handle noop
-        "new_mode_hex_opcode": "",
-    },
+    START: {"int_opcode": 128, "data_bytes": 0, "new_mode": "passive"},
+    RESET: {"int_opcode": 7, "data_bytes": 0, "new_mode": "off"},
+    STOP: {"int_opcode": 173, "data_bytes": 0, "new_mode": "off"},
+    BAUD: {"int_opcode": 129, "data_bytes": 1, "new_mode": None},  # new mode noop
+    SAFE: {"int_opcode": 131, "data_bytes": 0, "new_mode": "safe"},
+    FULL: {"int_opcode": 132, "data_bytes": 0, "new_mode": "full"},
+    CLEAN: {"int_opcode": 135, "data_bytes": 0, "new_mode": "passive"},
+    MAX_CLEAN: {"int_opcode": 136, "data_bytes": 0, "new_mode": "passive"},
+    SPOT: {"int_opcode": 134, "data_bytes": 0, "new_mode": "passive"},
+    FORCE_SEEKING_DOCK: {"int_opcode": 143, "data_bytes": 0, "new_mode": "passive"},
+    POWER: {"int_opcode": 133, "data_bytes": 0, "new_mode": "passive"},
 }

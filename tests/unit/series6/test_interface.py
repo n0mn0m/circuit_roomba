@@ -10,15 +10,25 @@ class Test_interface(unittest.TestCase):
     """
 
     def setUp(self) -> None:
-        interface.TRACK_HISTORY = True
         self.board = mock.MagicMock()
 
     @mock.patch("circuitroomba.series6.interface.busio", return_value=mock.MagicMock())
     @mock.patch(
         "circuitroomba.series6.interface.busio.UART", return_value=mock.MagicMock()
     )
-    def test_valid_modes_return_only_valid_modes(self, uart, busio):
+    def test_history_not_available_by_default(self, uart, busio):
         oi = interface.OpenInterface(self.board.RX, self.board.TX, self.board.A1)
+        self.assertEqual(False, oi.trace)
+        self.assertEqual(False, hasattr(oi, "history"))
+
+    @mock.patch("circuitroomba.series6.interface.busio", return_value=mock.MagicMock())
+    @mock.patch(
+        "circuitroomba.series6.interface.busio.UART", return_value=mock.MagicMock()
+    )
+    def test_valid_modes_return_only_valid_modes(self, uart, busio):
+        oi = interface.OpenInterface(
+            self.board.RX, self.board.TX, self.board.A1, trace=True
+        )
 
         self.assertEqual(oi.valid_modes, ("off", "safe", "passive", "full"))
 
@@ -27,7 +37,9 @@ class Test_interface(unittest.TestCase):
         "circuitroomba.series6.interface.busio.UART", return_value=mock.MagicMock()
     )
     def test_change_operating_mode(self, uart, busio):
-        oi = interface.OpenInterface(self.board.RX, self.board.TX, self.board.A1)
+        oi = interface.OpenInterface(
+            self.board.RX, self.board.TX, self.board.A1, trace=True
+        )
 
         oi.operating_mode = "safe"
         self.assertEqual(oi.operating_mode, "safe")
@@ -37,7 +49,9 @@ class Test_interface(unittest.TestCase):
         "circuitroomba.series6.interface.busio.UART", return_value=mock.MagicMock()
     )
     def test_invalid_operating_mode(self, uart, busio):
-        oi = interface.OpenInterface(self.board.RX, self.board.TX, self.board.A1)
+        oi = interface.OpenInterface(
+            self.board.RX, self.board.TX, self.board.A1, trace=True
+        )
 
         with self.assertRaises(RuntimeError):
             oi.operating_mode = "kernel"
@@ -47,7 +61,9 @@ class Test_interface(unittest.TestCase):
         "circuitroomba.series6.interface.busio.UART", return_value=mock.MagicMock()
     )
     def test_send_new_command(self, uart, busio):
-        oi = interface.OpenInterface(self.board.RX, self.board.TX, self.board.A1)
+        oi = interface.OpenInterface(
+            self.board.RX, self.board.TX, self.board.A1, trace=True
+        )
 
         oi.command(opcode.START)
         self.assertEqual(oi.history[0][1], opcode.START)
@@ -57,7 +73,9 @@ class Test_interface(unittest.TestCase):
         "circuitroomba.series6.interface.busio.UART", return_value=mock.MagicMock()
     )
     def test_history_cannot_exceed_10(self, uart, busio):
-        oi = interface.OpenInterface(self.board.RX, self.board.TX, self.board.A1)
+        oi = interface.OpenInterface(
+            self.board.RX, self.board.TX, self.board.A1, trace=True
+        )
 
         for i in range(15):
             oi.command(opcode.START)
@@ -65,17 +83,16 @@ class Test_interface(unittest.TestCase):
         self.assertEqual(len(oi.history), 10)
 
         for i in range(9):
-            if not i % 2:
-                self.assertEqual(oi.history[i], (None, opcode.START, b"\x00"))
-            else:
-                self.assertEqual(oi.history[i], ("passive", None, None))
+            self.assertEqual(oi.history[i], ("passive", opcode.START, b"\x00"))
 
     @mock.patch("circuitroomba.series6.interface.busio", return_value=mock.MagicMock())
     @mock.patch(
         "circuitroomba.series6.interface.busio.UART", return_value=mock.MagicMock()
     )
     def test_send_invalid_command(self, uart, busio):
-        oi = interface.OpenInterface(self.board.RX, self.board.TX, self.board.A1)
+        oi = interface.OpenInterface(
+            self.board.RX, self.board.TX, self.board.A1, trace=True
+        )
 
         with self.assertRaises(KeyError):
             oi.command("0x10")
@@ -85,7 +102,9 @@ class Test_interface(unittest.TestCase):
         "circuitroomba.series6.interface.busio.UART", return_value=mock.MagicMock()
     )
     def test_send_invalid_command_for_current_operating_mode(self, uart, busio):
-        oi = interface.OpenInterface(self.board.RX, self.board.TX, self.board.A1)
+        oi = interface.OpenInterface(
+            self.board.RX, self.board.TX, self.board.A1, trace=True
+        )
 
         with self.assertRaises(RuntimeError):
             oi.command(opcode.STOP)
@@ -96,11 +115,13 @@ class Test_interface(unittest.TestCase):
         "circuitroomba.series6.interface.busio.UART", return_value=mock.MagicMock()
     )
     def test_send_new_command_with_data(self, uart, busio):
-        oi = interface.OpenInterface(self.board.RX, self.board.TX, self.board.A1)
+        oi = interface.OpenInterface(
+            self.board.RX, self.board.TX, self.board.A1, trace=True
+        )
         oi.wake_up()
         oi.command(opcode.START)
         oi.command(opcode.BAUD, 11)
-        self.assertEqual(oi.history[1], ("passive", None, None))
+        self.assertEqual(oi.history[1], ("passive", opcode.START, b"\x00"))
         self.assertEqual(oi.history[0], (None, opcode.BAUD, b"\x0b"))
 
     @mock.patch("circuitroomba.series6.interface.busio", return_value=mock.MagicMock())
@@ -108,7 +129,9 @@ class Test_interface(unittest.TestCase):
         "circuitroomba.series6.interface.busio.UART", return_value=mock.MagicMock()
     )
     def test_send_new_command_with_invalid_data(self, uart, busio):
-        oi = interface.OpenInterface(self.board.RX, self.board.TX, self.board.A1)
+        oi = interface.OpenInterface(
+            self.board.RX, self.board.TX, self.board.A1, trace=True
+        )
 
         with self.assertRaises(RuntimeError):
             oi.command("0x7", 11)
@@ -122,12 +145,3 @@ class Test_interface(unittest.TestCase):
 
         with self.assertRaises(NotImplementedError):
             oi.keep_awake()
-
-    @mock.patch("circuitroomba.series6.interface.busio", return_value=mock.MagicMock())
-    @mock.patch(
-        "circuitroomba.series6.interface.busio.UART", return_value=mock.MagicMock()
-    )
-    def test_history_not_available(self, uart, busio):
-        interface.TRACK_HISTORY = False
-        oi = interface.OpenInterface(self.board.RX, self.board.TX, self.board.A1)
-        self.assertEqual(False, hasattr(oi, "history"))

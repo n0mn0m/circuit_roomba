@@ -3,8 +3,6 @@ import busio
 import digitalio
 from .opcode import commands, mode_commands, valid_modes
 
-TRACK_HISTORY = False
-
 
 class OpenInterface:
     """
@@ -42,7 +40,7 @@ class OpenInterface:
     https://www.irobotweb.com/~/media/MainSite/PDFs/About/STEM/Create/iRobot_Roomba_600_Open_Interface_Spec.pdf # noqa
     """
 
-    def __init__(self, rx_pin, tx_pin, brc_pin, baud_rate=115200):
+    def __init__(self, rx_pin, tx_pin, brc_pin, baud_rate=115200, trace=False):
         """
         Initialize communication pins and state. State is referred to as
         operating mode to stay consistent with the Open Interface Specification
@@ -50,14 +48,22 @@ class OpenInterface:
 
         Two list are created to capture operating mode and command history. Both
         store the last 5 items processed.
+
+        If trace is enabled the last 10 commands will be captured in self.history.
+
+        History tuple structure:
+        (operating_mode, command, data_bytes)
         """
         self._board = busio.UART(tx_pin, rx_pin, baudrate=baud_rate)
         self._rx_pin = rx_pin
         self._tx_pin = tx_pin
         self._brc_pin = brc_pin
-        self.baud_rate = baud_rate
+        self._baud_rate = baud_rate
         self._operating_mode = "off"
-        if TRACK_HISTORY:
+        self.trace = trace
+
+        # Could be expensive for an embedded environment.
+        if trace:
             self._history = [None for i in range(10)]
 
     @property
@@ -80,16 +86,22 @@ class OpenInterface:
 
     @operating_mode.setter
     def operating_mode(self, new_mode):
-        if new_mode in valid_modes:
+        """
+        Track the current operating mode of the Roomba to verify that the next
+        command is valid in the current mode. The mode is not written to the
+        board or transmitted to the Roomba because the Roomba has an internal
+        state that is maintained and changed based on the sequence of commands.
+        """
+        if new_mode and new_mode in valid_modes:
             self._operating_mode = new_mode
-        else:
+        # instead of just using an else need to do an elif since new_mode can be None
+        # for a noop operating mode change
+        elif new_mode and new_mode not in valid_modes:
             raise RuntimeError(
                 "New mode %s is not a valid mode.\n"
                 "See page 5 of the open interface specification or refer to the"
                 " OpenInterface valid_modes attribute." % (new_mode)
             )
-        if TRACK_HISTORY:
-            self.history = (new_mode, None, None)
 
     def command(self, new_command, data=0):
         """
@@ -124,28 +136,18 @@ class OpenInterface:
                 "information" % (command_struct["data_bytes"], len(bdata), new_command)
             )
 
-        if command_struct["new_mode"]:
-            self.operating_mode = command_struct["new_mode"]
-            self._board.write(command_struct["new_mode_hex_opcode"])
+        self.operating_mode = command_struct["new_mode"]
 
-        if TRACK_HISTORY:
-            self.history = (None, new_command, bdata)
+        if self.trace:
+            self.history = (command_struct["new_mode"], new_command, bdata)
 
-    def wake_up(self):
-        """
-        If the circuitroomba is in passive mode without any byte activity on the RX pin
-        for 5 minutes it will will enter into a sleep mode. To wake it up
-        you need to pulse the RX pin LOW/HIGH/LOW.
-        """
-        self._brc_pin.direction = digitalio.Direction.OUTPUT
+    @property
+    def baud_rate(self):
+        return self._baud_rate
 
-        for i in range(3):
-            self._brc_pin.value = False
-            time.sleep(0.5)
-            self._brc_pin.value = True
-            time.sleep(0.5)
-            self._brc_pin.value = False
-            time.sleep(0.5)
+    @baud_rate.setter
+    def baud_rate(self, rate):
+        self._baud_rate = rate
 
     def _brc_set_baud_rate(self, baud_rate=19200):
         """
@@ -168,6 +170,22 @@ class OpenInterface:
             time.sleep(0.25)
 
         self.baud_rate = baud_rate
+
+    def wake_up(self):
+        """
+        If the circuitroomba is in passive mode without any byte activity on the RX pin
+        for 5 minutes it will will enter into a sleep mode. To wake it up
+        you need to pulse the RX pin LOW/HIGH/LOW.
+        """
+        self._brc_pin.direction = digitalio.Direction.OUTPUT
+
+        for i in range(3):
+            self._brc_pin.value = False
+            time.sleep(0.5)
+            self._brc_pin.value = True
+            time.sleep(0.5)
+            self._brc_pin.value = False
+            time.sleep(0.5)
 
     def keep_awake(self, duty_cycle=60):
         """
