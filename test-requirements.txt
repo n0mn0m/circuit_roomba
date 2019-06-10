@@ -3,3 +3,4 @@ flake8
 mypy
 black
 coverage
+Adafruit-Blinka
