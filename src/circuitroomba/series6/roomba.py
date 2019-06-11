@@ -21,14 +21,14 @@ class Commands(OpenInterface):
     Commands is an abstraction layer that exposes methods representing the operations
     available in the Roomba Open Interface Spec.
 
-    >>> bot = roomba.Commands(board.RX, board.TX, board.A1)
+    >>> bot = roomba.Commands(board.TX, board.RX, board.A1)
     >>> bot.wake_up()
     >>> bot.start()
     >>> bot.clean()
     """
 
-    def __init__(self, rx_pin, tx_pin, brc_pin, baud_rate=115200, trace=False):
-        super().__init__(rx_pin, tx_pin, brc_pin, baud_rate)
+    def __init__(self, tx_pin, rx_pin, brc_pin, baud_rate=115200, trace=False):
+        super().__init__(tx_pin, rx_pin, brc_pin, baud_rate, trace)
 
     def __repr__(self):
         return (

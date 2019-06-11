@@ -39,19 +39,33 @@ CircuitPython helper library for interfacing with Roomba Open Interface devices.
 """
 
 import board
+import digitalio
 import time
 from circuitroomba.series6 import roomba
 
 __repo__ = "https://github.com/AlexanderHagerman/circuitroomba.git"
 
-bot = roomba.Commands(board.RX, board.TX, board.A1)
+bot = roomba.Commands(board.TX, board.RX, digitalio.DigitalInOut(board.A1))
+
+c = 0
 
 bot.wake_up()
-bot.start()
-bot.safe()
-bot.clean()
 
-time.sleep(5)
+while True:
+    bot.start()
+    bot.safe()
+    bot.clean()
 
-bot.power()
-bot.stop()
+    time.sleep(2)
+
+    bot.power()
+    bot.stop()
+
+    c += 1
+
+    print(c)
+
+    bot.wake_up()
+
+    if c == 2:
+        break

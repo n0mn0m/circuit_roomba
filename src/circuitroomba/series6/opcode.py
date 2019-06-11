@@ -1,37 +1,37 @@
 # circuitroomba opcodes
 # https://www.irobotweb.com/-/media/MainSite/PDFs/About/STEM/Create/iRobot_Roomba_600_Open_Interface_Spec.pdf?la=en
 
-START = "0x80"
-RESET = "0x7"
-BAUD = "0x81"
-CONTROL = "0x82"
-SAFE = "0x83"
-FULL = "0x84"
-POWER = "0x85"
-SPOT = "0x86"
-CLEAN = "0x87"
-MAX_CLEAN = "0x88"
-DRIVE = "0x89"
-MOTORS = "0x8a"
-PWM_MOTORS = "0x90"
-DRIVE_PWM = "0x92"
-LEDS = "0x8b"
-SONG = "0x8c"
-PLAY = "0x8d"
-STREAM = "0x94"
-QUERY_LIST = "0x95"
-DO_STREAM = "0x96"
-QUERY = "0x8e"
-FORCE_SEEKING_DOCK = "0x8f"
-SCHEDULING_LEDS = "0xa2"
-DIGIT_LEDS_RAW = "0xa3"
-DIGIT_LEDS_ASCII = "0xa4"
-BUTTONS = "0xa5"
-SCHEDULE = "0xa7"
-SET_DAY_TIME = "0xa8"
-STOP = "0xad"
-SAFE = "0x83"
-FULL = "0x84"
+START = b"\x80"
+RESET = b"\x07"
+BAUD = b"\x81"
+CONTROL = b"\x82"
+SAFE = b"\x83"
+FULL = b"\x84"
+POWER = b"\x85"
+SPOT = b"\x86"
+CLEAN = b"\x87"
+MAX_CLEAN = b"\x88"
+DRIVE = b"\x89"
+MOTORS = b"\x8A"
+PWM_MOTORS = b"\x90"
+DRIVE_PWM = b"\x92"
+LEDS = b"\x8B"
+SONG = b"\x8C"
+PLAY = b"\x8D"
+STREAM = b"\x94"
+QUERY_LIST = b"\x95"
+DO_STREAM = b"\x96"
+QUERY = b"\x8E"
+FORCE_SEEKING_DOCK = b"\x8F"
+SCHEDULING_LEDS = b"\xA2"
+DIGIT_LEDS_RAW = b"\xA3"
+DIGIT_LEDS_ASCII = b"\xA4"
+BUTTONS = b"\xA5"
+SCHEDULE = b"\xA7"
+SET_DAY_TIME = b"\xA8"
+STOP = b"\xAD"
+SAFE = b"\x83"
+FULL = b"\x84"
 
 
 baud_codes = {
@@ -54,9 +54,45 @@ valid_modes = ("off", "safe", "passive", "full")
 # Only SAFE and FULL have opcodes in the OI spec, because of that mode names
 # are used for keys instead of hex codes differing from commands.
 mode_commands = {
-    "passive": (START, RESET, STOP, BAUD),
-    "safe": (START, RESET, STOP, BAUD),
-    "full": (START, RESET, STOP, BAUD),
+    "passive": (
+        START,
+        RESET,
+        STOP,
+        BAUD,
+        SAFE,
+        FULL,
+        CLEAN,
+        MAX_CLEAN,
+        SPOT,
+        FORCE_SEEKING_DOCK,
+        POWER,
+    ),
+    "safe": (
+        START,
+        RESET,
+        STOP,
+        BAUD,
+        SAFE,
+        FULL,
+        CLEAN,
+        MAX_CLEAN,
+        SPOT,
+        FORCE_SEEKING_DOCK,
+        POWER,
+    ),
+    "full": (
+        START,
+        RESET,
+        STOP,
+        BAUD,
+        SAFE,
+        FULL,
+        CLEAN,
+        MAX_CLEAN,
+        SPOT,
+        FORCE_SEEKING_DOCK,
+        POWER,
+    ),
     "off": (START, RESET),
 }
 

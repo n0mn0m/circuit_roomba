@@ -134,7 +134,7 @@ class Test_interface(unittest.TestCase):
         )
 
         with self.assertRaises(RuntimeError):
-            oi.command("0x7", 11)
+            oi.command(opcode.RESET, 11)
 
     @mock.patch("circuitroomba.series6.interface.busio", return_value=mock.MagicMock())
     @mock.patch(
