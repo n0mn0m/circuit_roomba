@@ -40,7 +40,7 @@ class OpenInterface:
     https://www.irobotweb.com/~/media/MainSite/PDFs/About/STEM/Create/iRobot_Roomba_600_Open_Interface_Spec.pdf # noqa
     """
 
-    def __init__(self, rx_pin, tx_pin, brc_pin, baud_rate=115200, trace=False):
+    def __init__(self, tx_pin, rx_pin, brc_pin, baud_rate=115200, trace=False):
         """
         Initialize communication pins and state. State is referred to as
         operating mode to stay consistent with the Open Interface Specification
@@ -55,8 +55,8 @@ class OpenInterface:
         (operating_mode, command, data_bytes)
         """
         self._board = busio.UART(tx_pin, rx_pin, baudrate=baud_rate)
-        self._rx_pin = rx_pin
         self._tx_pin = tx_pin
+        self._rx_pin = rx_pin
         self._brc_pin = brc_pin
         self._baud_rate = baud_rate
         self._operating_mode = "off"
@@ -65,6 +65,8 @@ class OpenInterface:
         # Could be expensive for an embedded environment.
         if trace:
             self._history = [None for i in range(10)]
+
+        self._brc_pin.direction = digitalio.Direction.OUTPUT
 
     @property
     def valid_modes(self):
@@ -126,6 +128,7 @@ class OpenInterface:
             )
 
         if data and len(bdata) == command_struct["data_bytes"]:
+            print(bdata)
             self._board.write(bdata)
         elif data and len(bdata) != command_struct["data_bytes"]:
             raise RuntimeError(
@@ -161,7 +164,6 @@ class OpenInterface:
         See page 4 of the Open Interface Create 2/Series 6 manual for
         information on setting the baud rate at startup.
         """
-        self._brc_pin.direction = digitalio.Direction.OUTPUT
 
         for i in range(3):
             self._brc_pin.value = False
@@ -177,7 +179,6 @@ class OpenInterface:
         for 5 minutes it will will enter into a sleep mode. To wake it up
         you need to pulse the RX pin LOW/HIGH/LOW.
         """
-        self._brc_pin.direction = digitalio.Direction.OUTPUT
 
         for i in range(3):
             self._brc_pin.value = False

@@ -49,21 +49,33 @@ Usage Example
 .. code-block:: python
 
     import board
+    import digitalio
+    import time
     from circuitroomba.series6 import roomba
 
-    # Setup the interface
-    bot = roomba.Roomba(board.RX, board.TX, board.A1)
+    __repo__ = "https://github.com/AlexanderHagerman/circuitroomba.git"
 
-    # Wake the roomba up
+    # initialize roomba
+    bot = roomba.Commands(board.TX, board.RX, digitalio.DigitalInOut(board.A1))
+
+    # wake roomba from sleep mode
     bot.wake_up()
 
-    # Per the OI doc start must be the first command
-    bot.start()
+    # CircuitPython loop
+    while True:
+        # send commands
+        bot.start()
+        bot.safe()
+        bot.clean()
 
-    # Issue the rest of our commands
-    bot.clean()
-    bot.stop()
+        time.sleep(2)
 
+        bot.power()
+        bot.stop()
+
+        break
+
+More examples are available in `/examples`.
 
 
 Contributing
@@ -96,3 +108,26 @@ Now, once you have the virtual environment activated:
 This will output the documentation to ``docs/_build/html``. Open the index.html in your browser to
 view them. It will also (due to -W) error out on any warning like Travis will. This is a good way to
 locally verify it will pass.
+
+Images
+======
+
+.. image:: https://drive.google.com/open?id=1KtG_M6wwwOtODZrK1ZTnyX92WZUBcyOU
+   :target: https://drive.google.com/open?id=1KtG_M6wwwOtODZrK1ZTnyX92WZUBcyOU
+   :alt: circuit roomba high level
+
+.. image:: https://drive.google.com/open?id=1GCv2tUK9gy0zGXF1X7UAJXt-FR0cVhlm
+   :target: https://drive.google.com/open?id=1GCv2tUK9gy0zGXF1X7UAJXt-FR0cVhlm
+   :alt: circuit roomba running video
+
+.. image:: https://drive.google.com/open?id=1Um1UUVvmV5FkCiyP8SBmEOifm1huh9Bm
+   :target: https://drive.google.com/open?id=1Um1UUVvmV5FkCiyP8SBmEOifm1huh9Bm
+   :alt: roomba open interface connections
+
+.. image:: https://drive.google.com/open?id=1goaZUGYlUYxY0_c_kZM8E3LHNcuu2lPR
+   :target: https://drive.google.com/open?id=1goaZUGYlUYxY0_c_kZM8E3LHNcuu2lPR
+   :alt: circuit playground connections
+
+.. image:: https://drive.google.com/open?id=1YYps3UBBO7gMA1RfhlnACCx4bNVq-io_
+   :target: https://drive.google.com/open?id=1YYps3UBBO7gMA1RfhlnACCx4bNVq-io_
+   :alt: circuit playground connected to roomba
