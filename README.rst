@@ -1,3 +1,6 @@
+.. role:: bash(code)
+   :language: bash
+
 Introduction
 ============
 
@@ -26,13 +29,12 @@ Please ensure all dependencies are available on the CircuitPython filesystem.
 This is easily achieved by downloading
 `the Adafruit library and driver bundle <https://github.com/adafruit/Adafruit_CircuitPython_Bundle>`_.
 
-Installing from PyPI
---------------------
+Installing from PyPI for blinka boards
+--------------------------------------
 
 .. code-block:: shell
 
     pip install circuitroomba
-
 
 To install in a virtual environment in your current project:
 
@@ -42,6 +44,14 @@ To install in a virtual environment in your current project:
     python3 -m venv .env
     source .env/bin/activate
     pip install circuitroomba
+
+For CircuitPython  boards that don't support :bash:`blinka` copy :bash:`/circuitroomba` from :bash:`/src` to
+:bash:`/lib` on the CircuitPython board. :bash:`make install` has been setup as a helper, but you may need
+to update the :bash:`/Volume` path for your system and board name.
+
+.. code-block:: shell
+
+    make install
 
 Usage Example
 =============
@@ -75,7 +85,7 @@ Usage Example
 
         break
 
-More examples are available in `/examples`.
+More examples are available in :bash:`/examples`.
 
 
 Contributing
@@ -105,7 +115,7 @@ Now, once you have the virtual environment activated:
     cd docs
     sphinx-build -E -W -b html . _build/html
 
-This will output the documentation to ``docs/_build/html``. Open the index.html in your browser to
+This will output the documentation to :bash:`docs/_build/html`. Open the ``index.html`` in your browser to
 view them. It will also (due to -W) error out on any warning like Travis will. This is a good way to
 locally verify it will pass.
 

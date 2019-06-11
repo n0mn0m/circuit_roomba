@@ -24,6 +24,7 @@ setup(
     author="Alexander Hagerman",
     author_email="alexander@unexpectedeof.net",
     license="MIT",
+    install_requires=["Adafruit-Blinka"],
     classifiers=[
         "Development Status :: 3 - Alpha",
         "Intended Audience :: Developers",
