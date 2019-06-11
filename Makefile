@@ -17,3 +17,7 @@ clean:
 	pip uninstall circuitroomba
 	rm -rf .tox .eggs src/circuitroomba.egg-info
 
+install:
+	mkdir -p /Volumes/ROOMBAPY/lib/circuitroomba
+	cp -r ./src/circuitroomba /Volumes/ROOMBAPY/lib/circuitroomba
+
