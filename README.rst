@@ -21,7 +21,7 @@ CircuitRoomba is a CircuitPython library for interfacing with Roomba Open Interf
 
 Dependencies
 =============
-This driver depends on:
+This library depends on:
 
 * `Adafruit CircuitPython <https://github.com/adafruit/circuitpython>`_
 

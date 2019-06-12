@@ -26,19 +26,13 @@ Table of Contents
 .. todo:: Add any Learn guide links here. If there are none, then simply delete this todo and leave
     the toctree above for use later.
 
-.. toctree::
-    :caption: Related Products
-
-.. todo:: Add any product links here. If there are none, then simply delete this todo and leave
-    the toctree above for use later.
 
 .. toctree::
     :caption: Other Links
 
-    Download <https://github.com/AlexHagerman/CircuitPython_circuitroomba/releases/latest>
+    circuitroomba Issues <https://gitlab.com/AlexanderHagerman/circuitroomba/issues>
     CircuitPython Reference Documentation <https://circuitpython.readthedocs.io>
-    CircuitPython Support Forum <https://forums.adafruit.com/viewforum.php?f=60>
-    Discord Chat <https://adafru.it/discord>
+    CircuitPython Forum <https://forums.adafruit.com/viewforum.php?f=60>
     Adafruit Learning System <https://learn.adafruit.com>
     Adafruit Blog <https://blog.adafruit.com>
     Adafruit Store <https://www.adafruit.com>
