@@ -6,8 +6,19 @@ test:
     - pip install circuitpython-build-tools Sphinx sphinx-rtd-theme tox codecov
     - tox
     # - circuitpython-build-bundles --filename_prefix circuitroomba --library_location .
-    - codecov --token="fd0aace5-ac25-4b4d-8004-4304adc0c6f2"
+    - codecov -t $CODECOV_TOKEN
   artifacts:
     paths:
       - htmlcov/
+
+pypi:
+  stage: deploy
+  cache: {}
+  script:
+    - pip install -U twine
+    - python setup.py sdist
+    - twine upload dist/*
+  only:
+    - tags
+    - master
 
