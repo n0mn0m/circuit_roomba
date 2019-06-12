@@ -9,12 +9,8 @@ here = path.abspath(path.dirname(__file__))
 with open(path.join(here, "README.rst"), encoding="utf-8") as f:
     long_description = f.read()
 
-with open(path.join(here, "VERSION")) as version_file:
-    version = version_file.read().strip()
-
 setup(
     name="circuitroomba",
-    use_scm_version=True,
     setup_requires=["setuptools_scm"],
     description="CircuitPython helper library for interfacing with Roomba\
      Open Interface devices.",
@@ -38,5 +34,5 @@ setup(
 circuitroomba circuitroomba robot automation roomba interface",
     packages=find_packages(where="src"),
     package_dir={"": "src"},
-    version=version,
+    version="0.1.0",
 )
