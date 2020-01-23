@@ -1,6 +1,6 @@
 image: ubuntu/latest
 secrets:
-  - 46f739e5-4538-45dd-a79f-bf173b7a2ed9
+  - 22254790-6b01-431a-953e-323215895daa
 tasks:
   - test: |
       pip install circuitpython-build-tools Sphinx sphinx-rtd-theme tox codecov
