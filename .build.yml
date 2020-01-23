@@ -3,11 +3,14 @@ secrets:
   - 22254790-6b01-431a-953e-323215895daa
 tasks:
   - test: |
-      pip install circuitpython-build-tools Sphinx sphinx-rtd-theme tox codecov
-      tox
+      sudo apt-get install  -y python3-pip
+      pip3 install circuitpython-build-tools Sphinx sphinx-rtd-theme tox codecov
+      cd circuitroomba
+      /home/build/.local/bin/tox
       # - circuitpython-build-bundles --filename_prefix circuitroomba --library_location .
+      export CODECOV_TOKEN="42986408-779d-4135-a644-28b7dc5a83ae"
       export CODECOV=$(cat ~/.codecov)
-      codecov -t $CODECOV
+      /home/build/.local/bin/codecov -t $CODECOV
   # - pypi: |
   #     pip install -U twine
   #     python setup.py sdist
