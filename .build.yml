@@ -1,0 +1,14 @@
+image: ubuntu/latest
+secrets:
+  - 46f739e5-4538-45dd-a79f-bf173b7a2ed9
+tasks:
+  - test: |
+      pip install circuitpython-build-tools Sphinx sphinx-rtd-theme tox codecov
+      tox
+      # - circuitpython-build-bundles --filename_prefix circuitroomba --library_location .
+      export CODECOV=$(cat ~/.codecov)
+      codecov -t $CODECOV
+  # - pypi: |
+  #     pip install -U twine
+  #     python setup.py sdist
+  #     twine upload dist/*
