@@ -128,3 +128,6 @@ dmypy.json
 
 # Local
 .DS_Store
+
+# Patches
+.patch
